@@ -5,7 +5,7 @@ from ninja import Router
 from account.authorization import GlobalAuth, get_tokens_for_user
 from account.schemas import AccountCreate, AuthOut, SigninSchema, AccountOut, AccountUpdate, ChangePasswordSchema
 from config.utils.schemas import MessageOut
-from hospital.models import Patient_Profile
+from hospital.models import OutPatients
 from hospital.schemas.patientSchema import PatientProfileSchemaIn
 
 User = get_user_model()

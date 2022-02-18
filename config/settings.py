@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-lw!a9y9(a3*f=9$wf_fbl30fix9p#m7jz$=2k96us6i*@aohr8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -114,8 +114,8 @@ TIME_INPUT_FORMATS = ('%Y-%m-%d %I:%M %p')
 
 USE_I18N = False
 
-USE_TZ = False
-
+USE_TZ = True
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 60 * 24
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

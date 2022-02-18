@@ -3,8 +3,8 @@ from ninja import Schema
 from account.schemas import AccountCreate,AuthOut,AccountOut
 import datetime
 
-from hospital.models import Patient_Profile
-from hospital.schemas.patientSchema import PatientProfileSchemaOut
+
+from pydantic import UUID4
 
 
 class DoctorSchemaIn(Schema):
@@ -25,8 +25,7 @@ class Expertize(Schema):
     name : str
 
 class DoctorSchemaOut(Schema):
-    pk : str
-    user : AccountOut = None
+    pk : UUID4
     first_name : str = None
     last_name : str = None
     speciality : str = None
@@ -45,8 +44,17 @@ class PrescriptionSchemaIn(Schema):
     symptoms : str
 
 
+class ProfileSchemaOut(Schema):
+    pk : str
+    user : AccountOut
+    first_name : str = None
+    last_name : str = None
+    address : str = None
+    phone_number : str = None
+    profile_pic : str = None
+
 class PrescriptionSchemaOut(Schema):
     prescription : str
     symptoms : str
-    patient : PatientProfileSchemaOut
+    patient : ProfileSchemaOut
     doctor : DoctorSchemaOut

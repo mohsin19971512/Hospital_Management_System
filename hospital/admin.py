@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Heart_Care_Basics,Expertize,Appointment,Patient_Profile, Slider, Service, Item, Doctor, Expertize, Faq, Gallery, Prescription,Inpatient)
+from .models import (AppointmentFromReceptiontst,Heart_Care_Basics,Expertize,Appointment,OutPatients, Slider, Service, Item, Doctor, Expertize, Faq, Gallery, Prescription,Inpatient)
 from django.contrib.auth.models import User
 import sys
 from import_export.admin import ImportExportModelAdmin
@@ -17,6 +17,8 @@ class OriginAdmin(admin.ModelAdmin):
     #readonly_fields = [ "picture"]
 
 admin.site.register(Appointment)
+admin.site.register(AppointmentFromReceptiontst)
+
 admin.site.register(Prescription)
 admin.site.register(Heart_Care_Basics)
 admin.site.register(Slider)
@@ -31,16 +33,16 @@ class UserinInline(admin.TabularInline):
     model = Doctor
 @admin.register(Inpatient)
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ("name","age","gender")
+    list_display = ("full_name","age","gender")
 
-    list_filter = ("name", "gender","age")
-    date_hierarchy = 'entry_date_time'
-    list_per_page = sys.maxsize
-    exclude = ("user",)
+    list_filter = ("full_name", "gender","age")
+    #date_hierarchy = 'entry_date_time'
+    #list_per_page = sys.maxsize
+    #exclude = ("user",)
     #inlines = [UserinInline]
     #order.admin_order_field = '_hero_count'
-#admin.site.register(Patient_Profile)
+#admin.site.register(OutPatients)
 
-@admin.register(Patient_Profile)
+@admin.register(OutPatients)
 class profileadmin(ImportExportModelAdmin):
     pass

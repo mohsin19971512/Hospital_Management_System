@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from typing import List
+from account.authorization import GlobalAuth
+from config.utils.permissions import AuthBearer
+
 from ninja import Router
 from hospital.models import Doctor
 from hospital.schemas.appointmentSchema import AppointmentSchemaIn,AppointmentSchemaOut,NumberOfAppoinSchema
 from hospital.schemas.patientSchema import PatientProfileSchemaIn,PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
-from hospital.models import Appointment, Patient_Profile
+from hospital.models import Appointment, OutPatients
 from django.utils import timezone
 User = get_user_model()
 
@@ -15,9 +18,14 @@ patient = Router(tags=['patient'])
 
 
 # update profile
-@patient.put('update_profile/{id}', response={200:MessageOut})
-def update_profile(request,profile_in:PatientProfileSchemaIn,id:str,):
-    profile = get_object_or_404(Patient_Profile,id=id)
+@patient.put('update-profile',auth=GlobalAuth(), response={200:MessageOut,404:MessageOut})
+def update_profile(request,profile_in:PatientProfileSchemaIn):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+    except:
+        return 404, {'message': 'User does not exist'}
+
+    profile = get_object_or_404(OutPatients,user = user)
     for attr, value in profile_in.dict().items():
         setattr(profile, attr, value)
     profile.save()
@@ -26,17 +34,35 @@ def update_profile(request,profile_in:PatientProfileSchemaIn,id:str,):
 
 
 # view profile
-@patient.get('patient_profile/{id}', response={200:PatientProfileSchemaOut})
-def patient_profile(request,id:str):
-    patient = get_object_or_404(Patient_Profile,pk=id)
+@patient.get('OutPatient-profile-info',auth=GlobalAuth(), response={200:PatientProfileSchemaOut,404:MessageOut})
+def patient_profile(request):
+    try:
+        user = User.objects.get(id=request.auth['pk'])
+        try :
+            patient = OutPatients.objects.get(user = user)
+        except User.DoesNotExist:
+            return 404, {'message': 'Profile does not exist'}
+    except User.DoesNotExist:
+        return 404, {'message': 'User does not exist'}
+    except :
+        return 404, {'message': 'Missing token'}
+    patient = get_object_or_404(OutPatients,user = user)
     return 200 ,patient
 
 
 # Request Appointement 
-@patient.post('patient_add_appointment/', response={201:MessageOut})
-def patient_add_appointment(request,appointment_in:AppointmentSchemaIn,patient_id:str,doctor_id:str):
-    patient = get_object_or_404(Patient_Profile,pk=patient_id)
-    doctor = get_object_or_404(Doctor,pk=doctor_id)
+@patient.post('patient-add-appointment/',auth=GlobalAuth(), response={201:MessageOut,404:MessageOut})
+def patient_add_appointment(request,appointment_in:AppointmentSchemaIn,doctor_id:str):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        try :
+            doctor = get_object_or_404(Doctor,pk=doctor_id)
+        except:
+            return 404, {'message': 'doctor does not exist'}
+    except:
+        return 404, {'message': 'User does not exist'}
+
+    patient = get_object_or_404(OutPatients,user=user)
     appointment = Appointment.objects.create(**appointment_in.dict(),sending_date=timezone.now(),status = "requested",doctor=doctor,patient=patient)
     appointment.save()
 
@@ -46,22 +72,33 @@ def patient_add_appointment(request,appointment_in:AppointmentSchemaIn,patient_i
 #---------------------------------------------------------------------------------------------
 # get appointments endpiont
 # Return all appointments 
-@patient.get('patient_appointments/{patient_id}', response={200:List[AppointmentSchemaOut]})
-def patient_appointments(request,patient_id:str):
-    patient = get_object_or_404(Patient_Profile,pk=patient_id)
-    appointment = Appointment.objects.filter(patient=patient)
-    print(appointment.first().total_appointment)
-
+@patient.get('patient-appointments',auth=GlobalAuth(), response={200:List[AppointmentSchemaOut],404:MessageOut})
+def patient_appointments(request):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        outpatient = OutPatients.objects.get(user = user)
+        appointment = Appointment.objects.filter(patient=outpatient)
+    except:
+        return 404, {'message': 'token missing'}
     return 200 ,appointment
 
 
-# return (total_appointment,appointment_done,appointment_upcoming)
-@patient.get('number_of_appointments/{patient_id}', response={200:NumberOfAppoinSchema})
-def number_of_appointments(request,patient_id:str):
-    total_appointment = Appointment.objects.filter(patient = patient_id).count()
-    appointment_done = Appointment.objects.filter(patient = patient_id,status = "completed").count()
-    appointment_upcoming = Appointment.objects.filter(patient = patient_id,status = "pending").count()
+    
 
+
+# return (total_appointment,appointment_done,appointment_upcoming)
+@patient.get('number-of-appointments/',auth=GlobalAuth(), response={200:NumberOfAppoinSchema,404:MessageOut})
+def number_of_appointments(request):
+
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        outpatient = OutPatients.objects.get(user = user)
+    except:
+        return 404, {'message': 'User does not exist'}
+
+    total_appointment = Appointment.objects.filter(patient = outpatient).count()
+    appointment_done = Appointment.objects.filter(patient = outpatient,status = "completed").count()
+    appointment_upcoming = Appointment.objects.filter(patient = outpatient,status = "pending").count()
     return 200 ,{
         "total_appointment":total_appointment,
         "appointment_done" : appointment_done,
