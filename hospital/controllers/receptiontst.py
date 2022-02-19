@@ -9,7 +9,7 @@ from hospital.schemas.appointmentSchema import AppointmentFormReceptiontstIn, Ap
 from hospital.schemas.doctorSchema import DoctorSchemaIn,DoctorSchemaOut
 from hospital.schemas.patientSchema import InPatientProfileSchemaIn, InPatientProfileSchemaOut, PatientProfileSchemaIn,PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
-from hospital.models import Appointment, OutPatients
+from hospital.models import Appointment, OutPatients,Inpatient
 from account.schemas import AccountCreate,AuthOut
 from account.authorization import GlobalAuth, get_tokens_for_user
 
@@ -86,11 +86,22 @@ def get_all_appointments_added_by_receptiontst(request):
 # return (total_appointment,appointment_done,appointment_upcoming)
 @receptiontst.get('number-of-appointments', auth = GlobalAuth(),response={200:NumberOfAppoinSchema})
 def number_of_appointments(request):
-
+    today = datetime.today()
+    for_today = Inpatient.objects.filter(date_admitted__year=today.year, date_admitted__month=today.month, date_admitted__day=today.day).count()
+    doctors = Doctor.objects.all().count()
+    inpatients = Inpatient.objects.all().count()
+    outpatients = OutPatients.objects.all().count()
+    appoint_1 = Appointment.objects.all().count()
+    appoint_2 = AppointmentFromReceptiontst.objects.all().count()
+    all_appoint = appoint_1+appoint_2
     return 200 ,{
-        "total_appointment":Appointment.objects.all().count(),
+        "total_appointment":all_appoint,
         "appointment_done" : Appointment.objects.filter(status="completed").count(),
         "appointment_upcoming" : Appointment.objects.filter(status="pending").count(),
+        "admitted_today":for_today,
+        "doctors":doctors,
+        "inpatients":inpatients,
+        "outpatients":outpatients,
         }
 
 #------------------------------------------------------------------------------------------

@@ -17,12 +17,10 @@ class Doctor(Entity):
     picture = models.ImageField(upload_to="doctors/")
     address = models.CharField(max_length=40)
     mobile = models.CharField(max_length=20,null=True)
-    details = models.TextField()
-    experience = models.TextField()
+    experience = models.CharField(max_length=250,verbose_name="Experience in year")
     expertize = models.ManyToManyField(to='Expertize', related_name='doctors',null=True,blank=True)
-    twitter = models.CharField(max_length=120, blank=True, null=True)
-    facebook = models.CharField(max_length=120, blank=True, null=True)
-    instagram = models.CharField(max_length=120, blank=True, null=True)
+    availability = models.CharField(verbose_name="Availability",max_length=20,choices=[("Available","Available"),("On Leave","On Leave"),("Not Available","On Leave")])
+    working_days = models.CharField(max_length=250,verbose_name="Working Days") 
 
     @property
     def patients(self):
@@ -61,6 +59,7 @@ class Inpatient(Entity):
     address = models.CharField("Address",max_length=255,null=True)
     problem = models.CharField("Problem",max_length=255,null=True)
     phone =  models.CharField("Phone Number",max_length=13,null=True)
+    date_admitted=models.DateTimeField(auto_now_add=True, auto_now=False)
 
 class Appointment(Entity):
     patient=models.ForeignKey('hospital.OutPatients',on_delete=models.SET_NULL,null=True,related_name='appoinments')
@@ -84,24 +83,30 @@ class AppointmentFromReceptiontst(Entity):
         return f"Patient  ({self.full_name})"
 
 class Prescription(Entity):
-    prescription = models.CharField(max_length=1000,null=False)
+    prescribe = models.CharField(max_length=1000,null=False)
     symptoms = models.CharField(max_length=100,null=False)
     patient = models.ForeignKey('hospital.OutPatients',on_delete=models.SET_NULL,null=True,related_name='prescription')
     doctor = models.ForeignKey('hospital.doctor',on_delete=models.SET_NULL,null=True,related_name='prescription')
     created_date = models.DateTimeField(verbose_name="created date",default=timezone.now)
-    
+    #date prescribed
     class Meta:
         verbose_name = 'Prescription'
         verbose_name_plural = "Prescriptions"
         
     def __str__(self) -> str:
         return f"Prescription  ({self.prescription})"
-
+ 
 
     
 
 class Room_Allotments(Entity):
-    pass 
+    room_number = models.IntegerField(verbose_name="Room Number")
+    room_type = models.CharField(verbose_name="Room Type",max_length=100)
+    patient_name = models.CharField(verbose_name="Patient Name",max_length=200)
+    patient_name = models.CharField(verbose_name="Patient Name",max_length=200)
+    allotment_date = models.CharField(verbose_name="Allotment Date",max_length=200)
+    discharge_date = models.CharField(verbose_name=" Discharge Date",max_length=200)
+    doctor_name = models.CharField(verbose_name=" Doctor Name",max_length=200)
 
 
 

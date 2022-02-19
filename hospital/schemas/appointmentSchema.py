@@ -42,5 +42,9 @@ class NumberOfAppoinSchema(Schema):
     total_appointment : str
     appointment_done :str
     appointment_upcoming : str
+    admitted_today :str  = None
+    doctors : str = None
+    inpatients : str =  None
+    outpatients : str 
 
 

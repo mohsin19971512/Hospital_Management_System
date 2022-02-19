@@ -2,24 +2,22 @@ from typing import List
 from ninja import Schema
 from account.schemas import AccountCreate,AuthOut,AccountOut
 import datetime
-
-
 from pydantic import UUID4
 
 
 class DoctorSchemaIn(Schema):
     first_name : str
     last_name :str
+    gender : str
+    age : str
     speciality : str
     picture : str = None
     address : str =None
     mobile :str = None
-    details :str
     experience :str
-    #expertize = models.ManyToManyField(to='Expertize', related_name='doctors')
-    twitter :str
-    facebook :str
-    instagram :str
+    availability : str
+    working_days : str
+    
 
 class Expertize(Schema):
     name : str
@@ -32,12 +30,10 @@ class DoctorSchemaOut(Schema):
     picture : str = None
     address : str
     mobile : str
-    details : str
     experience : str
     expertize : List[Expertize] = None
-    twitter : str = None
-    facebook : str = None
-    instagram : str = None
+    availability : str
+    working_days : str
 
 class PrescriptionSchemaIn(Schema):
     prescription : str
@@ -54,7 +50,7 @@ class ProfileSchemaOut(Schema):
     profile_pic : str = None
 
 class PrescriptionSchemaOut(Schema):
-    prescription : str
+    prescribe : str
     symptoms : str
     patient : ProfileSchemaOut
     doctor : DoctorSchemaOut
