@@ -5,8 +5,9 @@ from account.authorization import GlobalAuth
 from config.utils.permissions import AuthBearer
 
 from ninja import Router
-from hospital.models import Doctor
+from hospital.models import Doctor, Prescription
 from hospital.schemas.appointmentSchema import AppointmentSchemaIn,AppointmentSchemaOut,NumberOfAppoinSchema
+from hospital.schemas.doctorSchema import PrescriptionSchemaOut
 from hospital.schemas.patientSchema import PatientProfileSchemaIn,PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
 from hospital.models import Appointment, OutPatients
@@ -46,7 +47,6 @@ def patient_profile(request):
         return 404, {'message': 'User does not exist'}
     except :
         return 404, {'message': 'Missing token'}
-    patient = get_object_or_404(OutPatients,user = user)
     return 200 ,patient
 
 
@@ -107,5 +107,16 @@ def number_of_appointments(request):
 
 #------------------------------------------------------------------------------------------
 
+
+@patient.get('get-prescriptions',auth=GlobalAuth(), response={200:List[PrescriptionSchemaOut],404:MessageOut})
+def get_prescriptions(request):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        outpatient = OutPatients.objects.get(user = user)
+    except:
+        return 404, {'message': 'User does not exist'}
+
+    prescription = Prescription.objects.filter(patient = outpatient)
+    return 200 , prescription
 
 

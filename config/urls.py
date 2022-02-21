@@ -14,10 +14,10 @@ api = NinjaAPI(
     title='Hospital API v1',
     description='API documentation',
 )
+api.add_router('auth', account_controller)
 api.add_router('doctor', doctor)
 api.add_router('patient', patient)
 api.add_router('receptiontst', receptiontst)
-api.add_router('auth', account_controller)
 
 
 admin.site.site_header = "Hospital Manager"

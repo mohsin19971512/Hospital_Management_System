@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (AppointmentFromReceptiontst,Heart_Care_Basics,Expertize,Appointment,OutPatients, Slider, Service, Item, Doctor, Expertize, Faq, Gallery, Prescription,Inpatient)
+from .models import (InpatientAppointments,Heart_Care_Basics,Expertize,Appointment,OutPatients, Slider, Service, Item, Doctor, Expertize, Faq, Gallery, Prescription,Inpatient)
 from django.contrib.auth.models import User
 import sys
 from import_export.admin import ImportExportModelAdmin
@@ -8,8 +8,8 @@ from import_export.admin import ImportExportModelAdmin
 class OriginAdmin(admin.ModelAdmin):
     list_display = ("first_name","address","patients")
 
-    list_filter = ( "first_name","address","mobile")
-    search_fields = ("mobile","address","first_name")
+    list_filter = ( "first_name","address","phone_number")
+    search_fields = ("phone_number","address","first_name")
     list_per_page = sys.maxsize
 
 
@@ -17,7 +17,7 @@ class OriginAdmin(admin.ModelAdmin):
     #readonly_fields = [ "picture"]
 
 admin.site.register(Appointment)
-admin.site.register(AppointmentFromReceptiontst)
+admin.site.register(InpatientAppointments)
 
 admin.site.register(Prescription)
 admin.site.register(Heart_Care_Basics)

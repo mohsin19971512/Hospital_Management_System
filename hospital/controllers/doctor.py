@@ -6,7 +6,7 @@ from typing import List
 from ninja import Router
 from hospital.models import Doctor, OutPatients
 from hospital.schemas.appointmentSchema import AppointmentSchemaOut
-from hospital.schemas.doctorSchema import DoctorSchemaIn,DoctorSchemaOut, PrescriptionSchemaIn
+from hospital.schemas.doctorSchema import CreateDoctorSchema, PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
 from hospital.schemas.patientSchema import PatientProfileSchemaIn,PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
 from hospital.models import Appointment, Prescription
@@ -16,9 +16,27 @@ User = get_user_model()
 
 doctor = Router(tags=['doctor'])
 
+
+
+# view profile
+@doctor.get('doctor-profile-info',auth=GlobalAuth(), response={200:DoctorSchemaOut,404:MessageOut})
+def doctor_profile(request):
+    try:
+        user = User.objects.get(id=request.auth['pk'])
+        try :
+            doctor = Doctor.objects.get(user = user)
+        except User.DoesNotExist:
+            return 404, {'message': 'Profile does not exist'}
+    except User.DoesNotExist:
+        return 404, {'message': 'User does not exist'}
+    except :
+        return 404, {'message': 'Missing token'}
+    return 200 ,doctor
+
+
 # update profile
 @doctor.put('update-profile',auth = GlobalAuth(), response={200:MessageOut,404:MessageOut})
-def update_profile(request,doctor_in:DoctorSchemaIn):
+def update_profile(request,doctor_in:UpdateDoctorSchema):
     try:
         user = get_object_or_404(User, id=request.auth['pk'])
     except:
@@ -48,10 +66,10 @@ def doctor_appointments(request):
 def patients_under_care(request):
     user = get_object_or_404(User, id=request.auth['pk'])
     doctor = get_object_or_404(Doctor,user=user)
-    patient_qs = []
-    for i in doctor.patients :
-        patient_qs.append(i.patients_qs)  
-    return 200,patient_qs
+    patient_q = []
+    for i in doctor.patients_qs :
+        patient_q.append(i.patient)  
+    return 200,patient_q
 
 
 @doctor.post('prescription',auth = GlobalAuth(), response={200:MessageOut,404:MessageOut})
@@ -62,3 +80,40 @@ def create_prescription(request,patient_id:str,prescription_in:PrescriptionSchem
     prescription = Prescription.objects.create(patient=patient,doctor=doctor,**prescription_in.dict())
     prescription.save()
     return 200,{'message':"presecription created successfully"}
+
+
+@doctor.get('get-all-prescription',auth = GlobalAuth(), response={200:List[PrescriptionSchemaOut],404:MessageOut})
+def get_prescriptions(request):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        doctor = Doctor.objects.get(user = user)
+    except:
+        return 404, {'message': 'User does not exist'}
+
+    prescription = Prescription.objects.filter(doctor = doctor)
+    return 200 , prescription
+
+
+@doctor.put('update-prescription/{id}',auth = GlobalAuth(), response={200:PrescriptionSchemaOut,404:MessageOut})
+def update_prescription(request,prescription_in:PrescriptionSchemaIn,id:str):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+    except:
+        return 404, {'message': 'User does not exist'}
+    doctor = get_object_or_404(Doctor,user=user)
+    prescription = get_object_or_404(Prescription,id=id)
+
+    for attr, value in prescription_in.dict().items():
+        setattr(prescription, attr, value)
+    prescription.save()
+
+    return 200 ,prescription
+
+
+#e36c8f7c-fadc-4273-b032-ddd1ffa16b00
+@doctor.delete('delete-prescription/{id}',auth = GlobalAuth(), response={200:MessageOut,404:MessageOut})
+def delete_prescription(request,id:str):
+    prescription = get_object_or_404(Prescription,id=id)
+    prescription.delete()
+
+    return 200 ,{'message':'prescription deleted successfully'}

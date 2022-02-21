@@ -4,9 +4,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from typing import List
 from ninja import Router
-from hospital.models import AppointmentFromReceptiontst, Doctor, Inpatient
+from hospital.models import InpatientAppointments, Doctor, Inpatient
 from hospital.schemas.appointmentSchema import AppointmentFormReceptiontstIn, AppointmentFormReceptiontstOut, AppointmentSchemaIn,AppointmentSchemaOut,NumberOfAppoinSchema
-from hospital.schemas.doctorSchema import DoctorSchemaIn,DoctorSchemaOut
+from hospital.schemas.doctorSchema import CreateDoctorSchema,DoctorSchemaOut
 from hospital.schemas.patientSchema import InPatientProfileSchemaIn, InPatientProfileSchemaOut, PatientProfileSchemaIn,PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
 from hospital.models import Appointment, OutPatients,Inpatient
@@ -29,14 +29,14 @@ def add_appointment(request,appointment_in:AppointmentFormReceptiontstIn,doctor_
     except :
         return 200 ,{'message':'doctor Does Not Exist'}
 
-    appointment = AppointmentFromReceptiontst.objects.create(**appointment_in.dict(),doctor=doctor)
+    appointment = InpatientAppointments.objects.create(**appointment_in.dict(),doctor=doctor)
     appointment.save()
 
     return 200 ,{'message':'appointment created successfully'}
 
 @receptiontst.put('update-appointment',auth = GlobalAuth(), response={200:MessageOut})
 def update_appointment(request,id:str,appointment_in:AppointmentFormReceptiontstIn):
-    appointment = get_object_or_404(AppointmentFromReceptiontst,pk = id)
+    appointment = get_object_or_404(InpatientAppointments,pk = id)
     for attr, value in appointment_in.dict().items():
         setattr(appointment, attr, value)
     appointment.save()
@@ -44,7 +44,7 @@ def update_appointment(request,id:str,appointment_in:AppointmentFormReceptiontst
 
 @receptiontst.delete('delete-appointment/{id}',auth = GlobalAuth(), response={200:MessageOut})
 def delete_appointment(request,id:str):
-    appointment = get_object_or_404(AppointmentFromReceptiontst,pk = id)
+    appointment = get_object_or_404(InpatientAppointments,pk = id)
     appointment.delete()
     return 200 ,{'message':'appointment Deleted successfully'}
 
@@ -73,9 +73,9 @@ def get_all_appointments(request):
     return 200 ,appintement
 
 
-@receptiontst.get('get-all-appointments-added-by-receptiontst',auth = GlobalAuth(), response={200:List[AppointmentFormReceptiontstOut]})
-def get_all_appointments_added_by_receptiontst(request):
-    appintement = AppointmentFromReceptiontst.objects.all().select_related("doctor")
+@receptiontst.get('get-all-Inpatient-Appointments',auth = GlobalAuth(), response={200:List[AppointmentFormReceptiontstOut]})
+def get_all_inpatient_Appointments(request):
+    appintement = InpatientAppointments.objects.all().select_related("doctor")
     for i in appintement :
         if i.visit_date :
             if i.visit_date <timezone.now():
@@ -84,7 +84,7 @@ def get_all_appointments_added_by_receptiontst(request):
     return 200 ,appintement
 
 # return (total_appointment,appointment_done,appointment_upcoming)
-@receptiontst.get('number-of-appointments', auth = GlobalAuth(),response={200:NumberOfAppoinSchema})
+@receptiontst.get('number-of-appointments-doctors-inpatients-outpatients-admitted_today', auth = GlobalAuth(),response={200:NumberOfAppoinSchema})
 def number_of_appointments(request):
     today = datetime.today()
     for_today = Inpatient.objects.filter(date_admitted__year=today.year, date_admitted__month=today.month, date_admitted__day=today.day).count()
@@ -92,7 +92,7 @@ def number_of_appointments(request):
     inpatients = Inpatient.objects.all().count()
     outpatients = OutPatients.objects.all().count()
     appoint_1 = Appointment.objects.all().count()
-    appoint_2 = AppointmentFromReceptiontst.objects.all().count()
+    appoint_2 = InpatientAppointments.objects.all().count()
     all_appoint = appoint_1+appoint_2
     return 200 ,{
         "total_appointment":all_appoint,
@@ -108,29 +108,42 @@ def number_of_appointments(request):
 
 # add doctor from receptiontst interface
 @receptiontst.post('add-doctor',auth = GlobalAuth(), response={ 400: MessageOut,201: AuthOut})
-def add_doctor(request,doctor_in:DoctorSchemaIn,user_in:AccountCreate):
-        
-    if user_in.password1 != user_in.password2:
+def add_doctor(request,doctor_in:CreateDoctorSchema):
+    
+    if doctor_in.password1 != doctor_in.password2:
         return 400, {'message': 'Passwords do not match!'}
 
     try:
-        User.objects.get(email=user_in.email)
+        User.objects.get(email=doctor_in.email)
     except User.DoesNotExist:
         new_user = User.objects.create_user(
-            first_name=user_in.first_name,
-            last_name=user_in.last_name,
-            phone_number = user_in.phone_number,
-            email=user_in.email,
-            password=user_in.password1,
+            first_name=doctor_in.first_name,
+            last_name=doctor_in.last_name,
+            phone_number = doctor_in.phone_number,
+            email=doctor_in.email,
+            password=doctor_in.password1,
             type = "doctor"
         )
 
-        doctor = Doctor.objects.create(user = new_user,**doctor_in.dict())
+        doctor = Doctor.objects.create( user = new_user,
+                                        first_name = doctor_in.first_name,
+                                        last_name = doctor_in.last_name,
+                                        gender = doctor_in.gender,
+                                        age = doctor_in.age, 
+                                        speciality = doctor_in.speciality,
+                                        picture = doctor_in.picture,
+                                        address = doctor_in.address,
+                                        phone_number = doctor_in.phone_number,
+                                        experience =doctor_in.experience,
+                                        availability =doctor_in.availability,
+                                        working_days =doctor_in.working_days,
+                                    )
         doctor.save()
         token = get_tokens_for_user(new_user)
         return 201, {
             'token': token,
             'account': new_user,
+            'type':new_user.type,
         }
 
     return 400, {'message': 'User already registered!'}

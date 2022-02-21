@@ -12,7 +12,6 @@ class AccountCreate(Schema):
     email: EmailStr
     password1: str = Field(min_length=8)
     password2: str
-    type :str
 
 
 class AccountOut(Schema):

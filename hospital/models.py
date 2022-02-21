@@ -11,15 +11,15 @@ class Doctor(Entity):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     first_name = models.CharField(verbose_name="first name",max_length=120)
     last_name = models.CharField(verbose_name="last name",max_length=120)
-    gender = models.CharField("Gender",max_length=100,choices=[("male","male"),("female","female")],null=True)
+    gender = models.CharField("Gender",max_length=100,choices=(("male","male"),("female","female")))
     age = models.CharField("age",max_length=100,null=True) 
     speciality = models.CharField(max_length=120)
     picture = models.ImageField(upload_to="doctors/")
     address = models.CharField(max_length=40)
-    mobile = models.CharField(max_length=20,null=True)
+    phone_number = models.CharField(max_length=20,null=True)
     experience = models.CharField(max_length=250,verbose_name="Experience in year")
     expertize = models.ManyToManyField(to='Expertize', related_name='doctors',null=True,blank=True)
-    availability = models.CharField(verbose_name="Availability",max_length=20,choices=[("Available","Available"),("On Leave","On Leave"),("Not Available","On Leave")])
+    availability = models.CharField(verbose_name="Availability",max_length=20,choices=(("Available","Available"),("On Leave","On Leave"),("Not Available","On Leave")))
     working_days = models.CharField(max_length=250,verbose_name="Working Days") 
 
     @property
@@ -72,7 +72,7 @@ class Appointment(Entity):
     def __str__(self) -> str:
         return f"Patient  ({self.symptoms})"
 
-class AppointmentFromReceptiontst(Entity):
+class InpatientAppointments(Entity):
     full_name = models.CharField(verbose_name="Full Name",max_length=100,null=False)
     doctor=models.ForeignKey(Doctor,on_delete=models.SET_NULL,null=True,related_name='AppointmentFormReceptiontst')
     symptoms = models.CharField(max_length=100,null=False)
@@ -94,7 +94,7 @@ class Prescription(Entity):
         verbose_name_plural = "Prescriptions"
         
     def __str__(self) -> str:
-        return f"Prescription  ({self.prescription})"
+        return f"Prescription  ({self.prescribe})"
  
 
     

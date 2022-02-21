@@ -1,22 +1,40 @@
 from typing import List
-from ninja import Schema
+from ninja import Field, Schema
 from account.schemas import AccountCreate,AuthOut,AccountOut
 import datetime
-from pydantic import UUID4
+from pydantic import UUID4, EmailStr
 
 
-class DoctorSchemaIn(Schema):
-    first_name : str
-    last_name :str
+
+class CreateDoctorSchema(Schema):
+    first_name : str = None
+    last_name : str = None
+    phone_number : str = None
+    email: EmailStr
+    password1: str = Field(min_length=8)
+    password2: str
     gender : str
     age : str
     speciality : str
     picture : str = None
     address : str =None
-    mobile :str = None
     experience :str
     availability : str
     working_days : str
+
+class UpdateDoctorSchema(Schema):
+    first_name : str = None
+    last_name : str = None
+    gender : str
+    age : str
+    speciality : str
+    picture : str = None
+    address : str =None
+    phone_number :str = None
+    experience :str
+    availability : str
+    working_days : str
+
     
 
 class Expertize(Schema):
@@ -29,20 +47,19 @@ class DoctorSchemaOut(Schema):
     speciality : str = None
     picture : str = None
     address : str
-    mobile : str
+    phone_number : str
     experience : str
     expertize : List[Expertize] = None
     availability : str
     working_days : str
 
 class PrescriptionSchemaIn(Schema):
-    prescription : str
+    prescribe : str
     symptoms : str
 
 
 class ProfileSchemaOut(Schema):
-    pk : str
-    user : AccountOut
+    pk : UUID4
     first_name : str = None
     last_name : str = None
     address : str = None
@@ -50,7 +67,10 @@ class ProfileSchemaOut(Schema):
     profile_pic : str = None
 
 class PrescriptionSchemaOut(Schema):
+    pk:UUID4
     prescribe : str
     symptoms : str
     patient : ProfileSchemaOut
     doctor : DoctorSchemaOut
+
+
