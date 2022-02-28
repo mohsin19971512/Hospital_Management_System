@@ -2,8 +2,6 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from typing import List
 from account.authorization import GlobalAuth
-from config.utils.permissions import AuthBearer
-
 from ninja import Router
 from hospital.models import Doctor, Prescription
 from hospital.schemas.appointmentSchema import AppointmentSchemaIn,AppointmentSchemaOut,NumberOfAppoinSchema

@@ -1,16 +1,14 @@
-from datetime import datetime
-from pydoc import Doc
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from typing import List
 from ninja import Router
 from hospital.models import Doctor, OutPatients
 from hospital.schemas.appointmentSchema import AppointmentSchemaOut
-from hospital.schemas.doctorSchema import CreateDoctorSchema, PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
-from hospital.schemas.patientSchema import PatientProfileSchemaIn,PatientProfileSchemaOut
+from hospital.schemas.doctorSchema import PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
+from hospital.schemas.patientSchema import PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
 from hospital.models import Appointment, Prescription
-from account.authorization import GlobalAuth, get_tokens_for_user
+from account.authorization import GlobalAuth
 
 User = get_user_model()
 
@@ -71,7 +69,7 @@ def patients_under_care(request):
         patient_q.append(i.patient)  
     return 200,patient_q
 
-
+# create prescription
 @doctor.post('prescription',auth = GlobalAuth(), response={200:MessageOut,404:MessageOut})
 def create_prescription(request,patient_id:str,prescription_in:PrescriptionSchemaIn):
     user = get_object_or_404(User, id=request.auth['pk'])
@@ -81,7 +79,7 @@ def create_prescription(request,patient_id:str,prescription_in:PrescriptionSchem
     prescription.save()
     return 200,{'message':"presecription created successfully"}
 
-
+#get all prescription
 @doctor.get('get-all-prescription',auth = GlobalAuth(), response={200:List[PrescriptionSchemaOut],404:MessageOut})
 def get_prescriptions(request):
     try:
@@ -93,7 +91,7 @@ def get_prescriptions(request):
     prescription = Prescription.objects.filter(doctor = doctor)
     return 200 , prescription
 
-
+# update prescription
 @doctor.put('update-prescription/{id}',auth = GlobalAuth(), response={200:PrescriptionSchemaOut,404:MessageOut})
 def update_prescription(request,prescription_in:PrescriptionSchemaIn,id:str):
     try:
@@ -110,7 +108,7 @@ def update_prescription(request,prescription_in:PrescriptionSchemaIn,id:str):
     return 200 ,prescription
 
 
-#e36c8f7c-fadc-4273-b032-ddd1ffa16b00
+#delete prescription
 @doctor.delete('delete-prescription/{id}',auth = GlobalAuth(), response={200:MessageOut,404:MessageOut})
 def delete_prescription(request,id:str):
     prescription = get_object_or_404(Prescription,id=id)

@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from typing import List
 from ninja import Router
@@ -62,7 +61,7 @@ def  add_date_from_receptionts(request,appointment_id:str,date:datetime):
 # get appointments endpiont
 
 # Return all appointments in receptiontst interface
-@receptiontst.get('get_all_appointments/',auth = GlobalAuth(), response={200:List[AppointmentSchemaOut]})
+@receptiontst.get('get_all_appointments_info/',auth = GlobalAuth(), response={200:List[AppointmentSchemaOut]})
 def get_all_appointments(request):
     appintement = Appointment.objects.all().select_related("doctor","patient")
     for i in appintement :
@@ -103,6 +102,15 @@ def number_of_appointments(request):
         "inpatients":inpatients,
         "outpatients":outpatients,
         }
+
+
+@receptiontst.get('appointments-requested',auth = GlobalAuth(),response={200:List[AppointmentSchemaOut]})
+def appointments_requested(request):
+   
+    requested = Appointment.objects.filter(status = "requested")
+   
+    return 200 ,requested
+
 
 #------------------------------------------------------------------------------------------
 
@@ -153,32 +161,28 @@ def add_doctor(request,doctor_in:CreateDoctorSchema):
 # add patient from receptiontst interface
 @receptiontst.post('add-inpatient',auth = GlobalAuth(), response={ 400: MessageOut,201: AuthOut})
 def add_inpatient(request,Inpatient_in:InPatientProfileSchemaIn):
-        
     patient = Inpatient.objects.create(**Inpatient_in.dict())
     patient.save()
-
     return 200, {'message': 'Inpatient created successfully'}
 
 
 
-
+# retrive all doctors 
 @receptiontst.get('get-all-doctors', response={200:List[DoctorSchemaOut]})
 def get_all_doctors(request):
-
     doctor = Doctor.objects.all()
-
     return 200,doctor
 
-
+# retrive all outpatients 
 @receptiontst.get('get-all-outpatients',auth = GlobalAuth(), response={200:List[PatientProfileSchemaOut]})
 def get_all_outpatients(request):
     patient = OutPatients.objects.all()
-
     return 200,patient
 
+
+# retrive all inpatients 
 @receptiontst.get('get-all-inpatients/', auth = GlobalAuth(),response={200:List[InPatientProfileSchemaOut]})
 def get_all_inpatients(request):
     patient = Inpatient.objects.all().select_related('doctor')
-
     return 200,patient
 

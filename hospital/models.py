@@ -19,7 +19,7 @@ class Doctor(Entity):
     phone_number = models.CharField(max_length=20,null=True)
     experience = models.CharField(max_length=250,verbose_name="Experience in year")
     expertize = models.ManyToManyField(to='Expertize', related_name='doctors',null=True,blank=True)
-    availability = models.CharField(verbose_name="Availability",max_length=20,choices=(("Available","Available"),("On Leave","On Leave"),("Not Available","On Leave")))
+    availability = models.CharField(verbose_name="Availability",max_length=20,choices=(("Available","Available"),("On Leave","On Leave"),("Not Available","Not Available")))
     working_days = models.CharField(max_length=250,verbose_name="Working Days") 
 
     @property
