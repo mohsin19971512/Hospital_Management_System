@@ -1,41 +1,11 @@
-from pyexpat import model
 from django.db import models
 from django.contrib.auth import get_user_model
 
 from config.utils.models import Entity
 User = get_user_model()
 from django.utils import timezone
-
-
-class Doctor(Entity):
-    user=models.OneToOneField(User,on_delete=models.CASCADE)
-    first_name = models.CharField(verbose_name="first name",max_length=120)
-    last_name = models.CharField(verbose_name="last name",max_length=120)
-    gender = models.CharField("Gender",max_length=100,choices=(("male","male"),("female","female")))
-    age = models.CharField("age",max_length=100,null=True) 
-    speciality = models.CharField(max_length=120)
-    picture = models.ImageField(upload_to="doctors/")
-    address = models.CharField(max_length=40)
-    phone_number = models.CharField(max_length=20,null=True)
-    experience = models.CharField(max_length=250,verbose_name="Experience in year")
-    expertize = models.ManyToManyField(to='Expertize', related_name='doctors',null=True,blank=True)
-    availability = models.CharField(verbose_name="Availability",max_length=20,choices=(("Available","Available"),("On Leave","On Leave"),("Not Available","Not Available")))
-    working_days = models.CharField(max_length=250,verbose_name="Working Days") 
-
-    @property
-    def patients(self):
-        return self.appointments.all().count()
-    @property
-    def patients_qs(self):
-        return self.appointments.all()
-
-    class Meta :
-        verbose_name = 'Doctor'
-        verbose_name_plural = 'Doctors'
-
-    def __str__(self):
-        return self.first_name
-
+from datetime import datetime
+from staff.models import Doctor
 
 class OutPatients(Entity):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
@@ -50,7 +20,7 @@ class OutPatients(Entity):
         return f"{self.first_name}  {self.last_name}"
 
     class Meta:
-        verbose_name_plural = "OutPatients Profiles"
+        verbose_name_plural = "Registered Patients Profiles"
 
 class Inpatient(Entity):
     full_name = models.CharField("Full Name",max_length=255,null=True)
@@ -60,6 +30,10 @@ class Inpatient(Entity):
     problem = models.CharField("Problem",max_length=255,null=True)
     phone =  models.CharField("Phone Number",max_length=13,null=True)
     date_admitted=models.DateTimeField(auto_now_add=True, auto_now=False)
+
+    class Meta:
+        verbose_name = "Patient"
+        verbose_name_plural = "Patients"
 
 class Appointment(Entity):
     patient=models.ForeignKey('hospital.OutPatients',on_delete=models.SET_NULL,null=True,related_name='appoinments')
@@ -86,8 +60,8 @@ class Prescription(Entity):
     prescribe = models.CharField(max_length=1000,null=False)
     symptoms = models.CharField(max_length=100,null=False)
     patient = models.ForeignKey('hospital.OutPatients',on_delete=models.SET_NULL,null=True,related_name='prescription')
-    doctor = models.ForeignKey('hospital.doctor',on_delete=models.SET_NULL,null=True,related_name='prescription')
-    created_date = models.DateTimeField(verbose_name="created date",default=timezone.now)
+    doctor = models.ForeignKey(Doctor,on_delete=models.SET_NULL,null=True,related_name='prescription')
+    created_date = models.DateTimeField(verbose_name="created date")
     #date prescribed
     class Meta:
         verbose_name = 'Prescription'
@@ -108,14 +82,35 @@ class Room_Allotments(Entity):
     discharge_date = models.CharField(verbose_name=" Discharge Date",max_length=200)
     doctor_name = models.CharField(verbose_name=" Doctor Name",max_length=200)
 
+    class Meta:
+        verbose_name = 'Room Allotment'
+        verbose_name_plural = "Room Allotments"
 
 
-class Expertize(Entity):
-    name = models.CharField(max_length=120)
+class Medicine(models.Model):
+    MEDICINE_NAME = models.CharField(verbose_name="Medicine Name",max_length=500)
+    SELLING_PRICE = models.IntegerField(verbose_name="Selling Price")
+    EXPIRE_DATE = models.DateField(verbose_name="Expire Date")
+    MANUFACTURE_NAME = models.CharField(verbose_name="Manufacture Name",max_length=500)
+    UNITARY_PRICE = models.IntegerField(verbose_name="Unitary Price")
+    QUANTITY = models.IntegerField(verbose_name="Quantity")
 
-    def __str__(self):
-        return self.name
+    def is_expired(self):
+        d = self.EXPIRE_DATE
+        date2 = datetime(d.year, d.month, d.day)
+        if date2 < datetime.now() :
+            return "Expired"
+        else :
+            return "Not Expired"
+    class Meta:
+        verbose_name = 'Medicine'
+        verbose_name_plural = "Medicines"
 
+    
+
+
+    def __str__(self) -> str:
+        return self.MEDICINE_NAME
 
 class Faq(Entity):
     question = models.CharField(max_length=120)
@@ -171,7 +166,13 @@ class Heart_Care_Basics(Entity):
         verbose_name_plural = "Heart Care Basicses"
 
 
+class Department(Entity):
+    name = models.CharField(verbose_name = "Name",max_length=250)
+    description = models.CharField(verbose_name="Description",max_length=500)
+    is_active = models.BooleanField(verbose_name="Activae",default=True)
 
+    def __str__(self) -> str:
+        return f'{self.name}'
 
 
 """

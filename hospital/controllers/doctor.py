@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from typing import List
 from ninja import Router
-from hospital.models import Doctor, OutPatients
+from staff.models import Doctor
 from hospital.schemas.appointmentSchema import AppointmentSchemaOut
 from hospital.schemas.doctorSchema import PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
 from hospital.schemas.patientSchema import PatientProfileSchemaOut

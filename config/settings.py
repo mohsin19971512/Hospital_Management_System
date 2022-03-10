@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'import_export',
     'hospital',
     'account',
+    'staff'
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -109,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = "Asia/Baghdad"
-TIME_INPUT_FORMATS = ('%Y-%m-%d %I:%M %p')
+#TIME_INPUT_FORMATS = ('%Y-%m-%d %I:%M %p')
 #TIME_ZONE = 'UTC'
 
 USE_I18N = False
@@ -144,10 +145,10 @@ JAZZMIN_SETTINGS = {
     "site_title": "Library Admin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Library",
+    "site_header": "Hospital",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Library",
+    "site_brand": "Receptionist",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
     #"site_logo": "books/img/logo.png",
@@ -159,10 +160,10 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome to the library",
+    "welcome_sign": "Welcome to the hospital",
 
     # Copyright on the footer
-    "copyright": "Acme Library Ltd",
+    #"copyright": "Acme Library Ltd",
 
     # The model admin to search from the search bar, search bar omitted if excluded
     "search_model": "auth.User",
@@ -187,7 +188,7 @@ JAZZMIN_SETTINGS = {
         {"model": "auth.User"},
 
         # App with dropdown menu to all its models pages (Permissions checked against models)
-        {"app": "books"},
+        {"app": "hospital"},
     ],
 
     #############
@@ -217,7 +218,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["auth", "books", "books.author", "books.book"],
+    "order_with_respect_to": ["auth", "hospital.Appointment", "hospital.InpatientAppointments","hospital.Doctor", "hospital.Inpatient","hospital.OutPatients","hospital.Prescription","hospital.Medicine","hospital.Room_Allotments","staff"],
 
     # Custom links to append to app groups, keyed on app name
     "custom_links": {

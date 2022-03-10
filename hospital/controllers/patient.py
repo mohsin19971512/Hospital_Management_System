@@ -3,7 +3,9 @@ from django.contrib.auth import get_user_model
 from typing import List
 from account.authorization import GlobalAuth
 from ninja import Router
-from hospital.models import Doctor, Prescription
+from hospital.models import  Prescription
+from staff.models import  Doctor
+
 from hospital.schemas.appointmentSchema import AppointmentSchemaIn,AppointmentSchemaOut,NumberOfAppoinSchema
 from hospital.schemas.doctorSchema import PrescriptionSchemaOut
 from hospital.schemas.patientSchema import PatientProfileSchemaIn,PatientProfileSchemaOut
