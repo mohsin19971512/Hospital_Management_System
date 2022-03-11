@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 from typing import List
 from ninja import Schema
 from pydantic import UUID4
