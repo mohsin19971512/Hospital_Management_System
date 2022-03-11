@@ -21,6 +21,7 @@ class AccountOut(Schema):
     phone_number : str = None
     email: EmailStr
 
+
 class TokenOut(Schema):
     access: str
 
@@ -49,3 +50,10 @@ class ChangePasswordSchema(Schema):
     old_password: str
     new_password1: str
     new_password2: str
+
+
+class ContactSchema(Schema):
+    name : str 
+    phone_number : str
+    subject : str
+

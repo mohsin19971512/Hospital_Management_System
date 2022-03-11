@@ -1,3 +1,4 @@
+import email
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -15,7 +16,7 @@ class OutPatients(Entity):
     age = models.CharField("age",max_length=100,null=True)
     address = models.CharField(max_length=250,null=True,blank=True)
     phone_number = models.CharField(max_length=11,null=True,blank=True)
-    profile_pic= models.ImageField(upload_to='PatientProfilePic/',verbose_name="profile picture",null=True,blank=True)
+    profile_pic= models.ImageField(upload_to='PatientProfilePic/',default='PatientProfilePic/default.jpg',verbose_name="profile picture",null=True,blank=True)
     def __str__(self):
         return f"{self.first_name}  {self.last_name}"
 
@@ -36,7 +37,7 @@ class Inpatient(Entity):
         verbose_name_plural = "Patients"
 
 class Appointment(Entity):
-    patient=models.ForeignKey('hospital.OutPatients',on_delete=models.SET_NULL,null=True,related_name='appoinments')
+    patient=models.ForeignKey(OutPatients,on_delete=models.SET_NULL,null=True,related_name='appoinments')
     doctor=models.ForeignKey(Doctor,on_delete=models.SET_NULL,null=True,related_name='appointments')
     symptoms = models.CharField(max_length=100,null=False)
     description=models.TextField(max_length=500)
@@ -61,7 +62,7 @@ class Prescription(Entity):
     symptoms = models.CharField(max_length=100,null=False)
     patient = models.ForeignKey('hospital.OutPatients',on_delete=models.SET_NULL,null=True,related_name='prescription')
     doctor = models.ForeignKey(Doctor,on_delete=models.SET_NULL,null=True,related_name='prescription')
-    created_date = models.DateTimeField(verbose_name="created date")
+    created_date = models.DateTimeField(auto_now=True,null=True,blank=True,verbose_name="created date")
     #date prescribed
     class Meta:
         verbose_name = 'Prescription'
@@ -111,6 +112,50 @@ class Medicine(models.Model):
 
     def __str__(self) -> str:
         return self.MEDICINE_NAME
+
+class Surgery(Entity):
+    name = models.CharField("Name",max_length=255,null=True)
+    age = models.CharField("age",max_length=100)
+    weight = models.CharField("Weight",max_length=100)
+    gender = models.CharField("Gender",max_length=100,choices=[("male","male"),("fmale","fmale")])
+    number = models.CharField(verbose_name="Number",max_length=100)
+    Ward = models.CharField("Ward",max_length=100)
+    Bed = models.CharField("Bed",max_length=100)
+    diagnoses = models.CharField("Diagnoses",max_length=255)
+    operation_type = models.CharField("Operation Type",max_length=255)
+    entry_date_time = models.DateTimeField("entry date time",auto_now_add=True)
+    operation_date_time = models.DateTimeField("operation date time",auto_now_add=False)
+    leaving_date_time = models.DateTimeField("leaving date time",auto_now_add=False)
+    medications = models.TextField("Medications")
+    operative_finding = models.TextField("operative finding",max_length=255)
+    operative_procedure = models.TextField("operative procedure",max_length=255)
+    operative_note = models.TextField("operative note",max_length=255)
+    specimen_to_laboratory = models.BooleanField("specimen to laboratory")
+    consultant_surgeon = models.CharField("consultant surgeon",max_length=255)
+    co_surgeon = models.CharField("co_surgeon",max_length=255)
+    surgeon = models.CharField("surgeon",max_length=255)
+    anesthetist =models.CharField("anesthetist",max_length=255)
+    nurse = models.ForeignKey("staff.nurse",verbose_name="Nurse",null=True,on_delete=models.SET_NULL)
+    sponge_nurse = models.CharField("sponge_nurse",max_length=255)
+    doctor_name = models.ForeignKey("staff.Doctor",verbose_name="Doctor",null=True,on_delete=models.SET_NULL)
+
+    class Meta:
+        verbose_name = 'Surgical record'
+        verbose_name_plural = "Surgical record"
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Contact(Entity):
+    name = models.CharField(max_length=200,verbose_name="Name")
+    phone_number = models.CharField(max_length=12,verbose_name="Phone Number")
+    subject = models.TextField(verbose_name=" Message")
+    created = models.DateTimeField(auto_now=True,null=True,blank=True)
+
+    def __str__(self) -> str:
+        return f'{self.name}'
+
 
 class Faq(Entity):
     question = models.CharField(max_length=120)

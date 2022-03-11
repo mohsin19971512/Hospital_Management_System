@@ -13,6 +13,8 @@ class PatientProfileSchemaOut(Schema):
     last_name : str = None
     address : str = None
     phone_number : str = None
+    gender:str = None
+    age : str = None
     profile_pic : str = None
 
 class PatientProfileSchemaIn(Schema):

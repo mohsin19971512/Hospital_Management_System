@@ -132,7 +132,7 @@ AUTH_USER_MODEL = 'account.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'heartcare/static')
+    os.path.join(BASE_DIR, 'hospital/static')
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -218,7 +218,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["auth", "hospital.Appointment", "hospital.InpatientAppointments","hospital.Doctor", "hospital.Inpatient","hospital.OutPatients","hospital.Prescription","hospital.Medicine","hospital.Room_Allotments","staff"],
+    "order_with_respect_to": ["auth", "hospital.Appointment", "hospital.InpatientAppointments", "hospital.Inpatient","hospital.OutPatients","hospital.Prescription","hospital.Surgery","hospital.Medicine","hospital.Room_Allotments","staff"],
 
     # Custom links to append to app groups, keyed on app name
     "custom_links": {

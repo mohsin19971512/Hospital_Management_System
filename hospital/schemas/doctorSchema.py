@@ -72,5 +72,5 @@ class PrescriptionSchemaOut(Schema):
     symptoms : str
     patient : ProfileSchemaOut
     doctor : DoctorSchemaOut
-
+    created_date : datetime.datetime
 

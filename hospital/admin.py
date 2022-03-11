@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import (InpatientAppointments,Heart_Care_Basics,Appointment, Medicine,OutPatients, Room_Allotments, Slider, Service, Item, Faq, Gallery, Prescription,Inpatient)
+
+from .models import (Contact,InpatientAppointments,Heart_Care_Basics,Appointment, Medicine,OutPatients, Room_Allotments, Slider, Service, Item, Faq, Gallery, Prescription,Inpatient, Surgery)
 from django.contrib.auth.models import User
 import sys
 from import_export.admin import ImportExportModelAdmin
@@ -14,6 +15,12 @@ class Appointmentadmin(admin.ModelAdmin):
     search_fields = ["patient__first_name","doctor__first_name","symptoms","description","sending_date","visit_date","status"]
     list_filter = ("status",)
 
+
+
+@admin.register(Contact)
+class Contactadmin(admin.ModelAdmin):
+    list_display = ("name","phone_number","subject","created")
+    
 
 @admin.register(InpatientAppointments)
 class InpatientAppointmentsdmin(admin.ModelAdmin):
@@ -51,7 +58,15 @@ class Medicineadmin(admin.ModelAdmin):
     list_display = ("MEDICINE_NAME","SELLING_PRICE","MANUFACTURE_NAME","UNITARY_PRICE","QUANTITY","EXPIRE_DATE","is_expired")
 
 
+@admin.register(Surgery)
+class Surgeryadmin(admin.ModelAdmin):
+    list_display = ("name","age","weight","gender","operation_type","diagnoses","entry_date_time","operation_date_time","doctor_name","nurse")
+    #search_fields = ["patient__first_name","doctor__first_name","symptoms","prescribe","created_date"]
+
+
+
 admin.site.register(Heart_Care_Basics)
+
 admin.site.register(Slider)
 admin.site.register(Service)
 admin.site.register(Item)

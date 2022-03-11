@@ -19,6 +19,9 @@ class Nurse(Entity):
         verbose_name = "Nures "
         verbose_name_plural = "Nurses"
 
+    def __str__(self): 
+        return self.name
+
 class OtherEmployee(Entity):
     name = models.CharField(verbose_name="Name ",max_length=100)
     salary = models.IntegerField(verbose_name="Salary ")
@@ -33,7 +36,8 @@ class OtherEmployee(Entity):
     class Meta :
         verbose_name = "Other Employee"
         verbose_name_plural = "Other Employees"
-
+    def __str__(self): 
+        return self.name
 
 class Expertize(Entity):
     name = models.CharField(max_length=120)
@@ -53,7 +57,7 @@ class Doctor(Entity):
     address = models.CharField(max_length=40)
     phone_number = models.CharField(max_length=20,null=True)
     experience = models.CharField(max_length=250,verbose_name="Experience in year")
-    expertize = models.ManyToManyField(to='Expertize', related_name='doctors',null=True,blank=True)
+    expertize = models.ManyToManyField(to='Expertize', related_name='doctors')
     availability = models.CharField(verbose_name="Availability",max_length=20,choices=(("Available","Available"),("On Leave","On Leave"),("Not Available","Not Available")))
     working_days = models.CharField(max_length=250,verbose_name="workdays") 
 

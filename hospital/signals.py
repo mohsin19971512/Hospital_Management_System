@@ -21,6 +21,7 @@ def post_save_create_profile(sender, instance, created, **kwargs):
 
 
 
+
 """@receiver(post_save, sender=User)
 def post_save_create_profile(sender, instance, created, **kwargs):
     # print('sender', sender)

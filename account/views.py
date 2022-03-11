@@ -3,11 +3,11 @@ from django.shortcuts import get_object_or_404
 from ninja import Router
 
 from account.authorization import GlobalAuth, get_tokens_for_user
-from account.schemas import AccountCreate, AuthOut, SigninSchema, AccountOut, AccountUpdate, ChangePasswordSchema
+from account.schemas import AccountCreate, AuthOut, ContactSchema, SigninSchema, AccountOut, AccountUpdate, ChangePasswordSchema
 from config.utils.schemas import MessageOut
 from hospital.models import OutPatients
 from hospital.schemas.patientSchema import PatientProfileSchemaIn
-
+from hospital.models import Contact
 User = get_user_model()
 
 account_controller = Router(tags=['auth'])
@@ -64,6 +64,7 @@ def signin(request, signin_in: SigninSchema):
     }
 
 
+
 @account_controller.get('', auth=GlobalAuth(), response=AccountOut)
 def me(request):
     return get_object_or_404(User, id=request.auth['pk'])
@@ -95,3 +96,13 @@ def change_password(request, password_update_in: ChangePasswordSchema):
     user.set_password(password_update_in.new_password1)
     user.save()
     return {'message': 'password updated successfully'}
+
+
+@account_controller.post('contact-us', response={
+    200: MessageOut,
+})
+def createContactUs(request, contact_in: ContactSchema):
+    contact = Contact.objects.create(**contact_in.dict())
+    contact.save()
+
+    return 200,{"message":"Contact created successfully"}

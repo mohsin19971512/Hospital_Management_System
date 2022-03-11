@@ -1,3 +1,4 @@
+from tkinter.messagebox import NO
 from typing import List
 from ninja import Schema
 from pydantic import UUID4
@@ -39,12 +40,12 @@ class AppointmentFormReceptiontstOut(Schema):
     status : str
 
 class NumberOfAppoinSchema(Schema):
-    total_appointment : str
-    appointment_done :str
-    appointment_upcoming : str
+    total_appointment : str = None
+    appointment_done :str = None
+    appointment_upcoming : str = None
     admitted_today :str  = None
     doctors : str = None
     inpatients : str =  None
-    outpatients : str 
+    outpatients : str  = None
 
 

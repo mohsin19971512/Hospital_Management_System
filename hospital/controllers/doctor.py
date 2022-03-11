@@ -7,7 +7,7 @@ from hospital.schemas.appointmentSchema import AppointmentSchemaOut
 from hospital.schemas.doctorSchema import PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
 from hospital.schemas.patientSchema import PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
-from hospital.models import Appointment, Prescription
+from hospital.models import Appointment, Prescription,OutPatients
 from account.authorization import GlobalAuth
 
 User = get_user_model()

@@ -15,7 +15,7 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password1', 'password2')
+        fields = ('email', 'password1', 'password2','type')
 
     def __init__(self, *args, **kwargs):
         """
@@ -23,7 +23,7 @@ class RegistrationForm(UserCreationForm):
         """
         super(RegistrationForm, self).__init__(*args, **kwargs)
         for field in (
-                self.fields['email'], self.fields['password1'], self.fields['password2']):
+                self.fields['email'], self.fields['password1'], self.fields['password2'],self.fields['type']):
             field.widget.attrs.update({'class': FORM_CONTROL})
 
 
