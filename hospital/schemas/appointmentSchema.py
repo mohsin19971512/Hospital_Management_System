@@ -9,14 +9,14 @@ from hospital.schemas.doctorSchema import DoctorSchemaOut
 
 
 class AppointmentSchemaOut(Schema):
-    id : UUID4
+    id : UUID4 = None
     patient : PatientProfileSchemaOut
     doctor :DoctorSchemaOut
-    symptoms : str
-    description : str
+    symptoms : str 
+    description : str 
     sending_date : datetime.datetime =None
     visit_date : datetime.datetime =None
-    status : str = None
+    status : str 
 
 class AppointmentSchemaIn(Schema):
     symptoms : str
@@ -31,12 +31,16 @@ class AppointmentFormReceptiontstIn(Schema):
     status : str
 
 class AppointmentFormReceptiontstOut(Schema):
-    pk : UUID4 
-    full_name : str 
-    symptoms : str
-    description : str
-    visit_date : datetime.datetime
+    pk : UUID4 = None
+    full_name : str  
+    doctor :DoctorSchemaOut 
+    symptoms : str 
+    description : str = None
+    visit_date : datetime.datetime = None
     status : str
+
+
+
 
 class NumberOfAppoinSchema(Schema):
     total_appointment : str = None
@@ -48,3 +52,14 @@ class NumberOfAppoinSchema(Schema):
     outpatients : str  = None
 
 
+
+
+
+"""
+
+class AppointementsForToday(Schema):
+    #inappoint : List[AppointmentFormReceptiontstOut]
+    AppointmentSchemaOut : List[AppointmentSchemaOut]
+
+
+"""

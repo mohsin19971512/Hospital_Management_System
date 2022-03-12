@@ -72,7 +72,7 @@ def patient_add_appointment(request,appointment_in:AppointmentSchemaIn,doctor_id
 #---------------------------------------------------------------------------------------------
 # get appointments endpiont
 # Return all appointments 
-@patient.get('patient-appointments',auth=GlobalAuth(), response={200:List[AppointmentSchemaOut],404:MessageOut})
+@patient.get('patient-appointments',auth=GlobalAuth(), response={200:List[AppointmentSchemaOut],201:MessageOut,404:MessageOut})
 def patient_appointments(request):
     try:
         user = get_object_or_404(User, id=request.auth['pk'])
@@ -80,7 +80,12 @@ def patient_appointments(request):
         appointment = Appointment.objects.filter(patient=outpatient)
     except:
         return 404, {'message': 'token missing'}
-    return 200 ,appointment
+
+    if len(appointment)>=1:
+
+        return 200 ,appointment
+    else :
+        return 201,{"message":"You don't have an appointment"}
 
 
     

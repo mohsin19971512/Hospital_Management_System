@@ -21,7 +21,7 @@ class OutPatients(Entity):
         return f"{self.first_name}  {self.last_name}"
 
     class Meta:
-        verbose_name_plural = "Registered Patients Profiles"
+        verbose_name_plural = "Outpatients Profiles"
 
 class Inpatient(Entity):
     full_name = models.CharField("Full Name",max_length=255,null=True)
@@ -33,8 +33,8 @@ class Inpatient(Entity):
     date_admitted=models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
-        verbose_name = "Patient"
-        verbose_name_plural = "Patients"
+        verbose_name = "Inpatient"
+        verbose_name_plural = "Inpatients"
 
 class Appointment(Entity):
     patient=models.ForeignKey(OutPatients,on_delete=models.SET_NULL,null=True,related_name='appoinments')
@@ -44,6 +44,11 @@ class Appointment(Entity):
     sending_date=models.DateTimeField(verbose_name="Sending date",default=timezone.now)
     visit_date = models.DateTimeField(verbose_name="Visit date",null=True,blank=True)
     status = models.CharField(max_length=100,choices=[("pending","pending"),("requested","requested"),("completed","completed")])
+
+    class Meta:
+        verbose_name = "Outpatient Appoinntment"
+        verbose_name_plural = "Outpatients Appoinntments"
+
     def __str__(self) -> str:
         return f"Patient  ({self.symptoms})"
 
@@ -54,6 +59,11 @@ class InpatientAppointments(Entity):
     description=models.TextField(max_length=500)
     visit_date = models.DateTimeField(verbose_name="Visit date",null=True,blank=True)
     status = models.CharField(max_length=100,choices=[("pending","pending"),("requested","requested"),("completed","completed")])
+    
+    class Meta:
+        verbose_name = "Inpatient Appoinntment"
+        verbose_name_plural = "Inpatients Appoinntments"
+
     def __str__(self) -> str:
         return f"Patient  ({self.full_name})"
 

@@ -67,11 +67,11 @@ class Surgeryadmin(admin.ModelAdmin):
 
 admin.site.register(Heart_Care_Basics)
 
-admin.site.register(Slider)
-admin.site.register(Service)
-admin.site.register(Item)
-admin.site.register(Faq)
-admin.site.register(Gallery)
+#admin.site.register(Slider)
+#admin.site.register(Service)
+#admin.site.register(Item)
+#admin.site.register(Faq)
+#admin.site.register(Gallery)
 #admin.site.register(Patient_Info_in_Hospital)
 
 @admin.register(Inpatient)

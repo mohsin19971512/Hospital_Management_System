@@ -3,12 +3,13 @@ from django.contrib.auth import get_user_model
 from typing import List
 from ninja import Router
 from staff.models import Doctor
-from hospital.schemas.appointmentSchema import AppointmentSchemaOut
-from hospital.schemas.doctorSchema import PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
+from hospital.schemas.appointmentSchema import AppointmentFormReceptiontstOut, AppointmentSchemaOut, NumberOfAppoinSchema
+from hospital.schemas.doctorSchema import  PrescriptionSchemaOut,UpdateDoctorSchema,DoctorSchemaOut, PrescriptionSchemaIn
 from hospital.schemas.patientSchema import PatientProfileSchemaOut
 from config.utils.schemas import  MessageOut
-from hospital.models import Appointment, Prescription,OutPatients
+from hospital.models import Appointment, InpatientAppointments, Prescription,OutPatients
 from account.authorization import GlobalAuth
+from datetime import datetime
 
 User = get_user_model()
 
@@ -115,3 +116,48 @@ def delete_prescription(request,id:str):
     prescription.delete()
 
     return 200 ,{'message':'prescription deleted successfully'}
+
+
+@doctor.get('your-patients-for-today-1',auth = GlobalAuth(), response={200:List[AppointmentSchemaOut],404:MessageOut})
+def your_patients_for_today(request):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        doctor = Doctor.objects.get(user = user)
+    except:
+        return 404, {'message': 'User does not exist'}
+    today = datetime.today()
+
+    appointment = Appointment.objects.filter(doctor = doctor,status = "pending",visit_date__year=today.year, visit_date__month=today.month, visit_date__day=today.day)
+    return 200,appointment
+
+
+@doctor.get('your-patients-for-today-2',auth = GlobalAuth(), response={200:List[AppointmentFormReceptiontstOut],201:MessageOut,404:MessageOut})
+def your_patients_for_today_2(request):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        doctor = Doctor.objects.get(user = user)
+    except:
+        return 404, {'message': 'User does not exist'}
+    today = datetime.today()
+
+    appointment = InpatientAppointments.objects.filter(doctor = doctor,status = "pending",visit_date__year=today.year, visit_date__month=today.month, visit_date__day=today.day)
+    return 200,appointment
+    
+
+# return (total_appointment,appointment_upcoming)
+@doctor.get('number-of-appointments', auth = GlobalAuth(),response={200:NumberOfAppoinSchema})
+def number_of_appointments(request):
+    try:
+        user = get_object_or_404(User, id=request.auth['pk'])
+        doctor = Doctor.objects.get(user = user)
+    except:
+        return 404, {'message': 'User does not exist'}
+    appointment1 = InpatientAppointments.objects.filter(doctor = doctor,status = "pending").count()
+    appointment2 = Appointment.objects.filter(doctor = doctor,status = "pending").count()
+    pending = appointment1+appointment2
+
+    
+    return 200 ,{
+        "total_appointment":InpatientAppointments.objects.filter(doctor = doctor).count()+Appointment.objects.filter(doctor = doctor,).count(),
+        "appointment_upcoming" : pending,
+        }
